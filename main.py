@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-import datetime
+from datetime import datetime
 
 app = FastAPI()
 
@@ -7,6 +7,15 @@ user_points = 0
 payer_points = {}
 transactions = []
 
+
 @app.get("/")
-async def root():
-    return "Hello World :)"
+def get_payer_points():
+    return payer_points
+
+@app.post("/")
+def add_transaction():
+  pass
+
+@app.post("/spend")
+def spend_payer_points():
+  pass
