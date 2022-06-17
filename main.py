@@ -10,22 +10,31 @@ class PayerTransaction(BaseModel):
   points: int
   timestamp: datetime
 
-class UserSpend(BaseModel):
-  points: int
+
 
 total_points = 0
 payer_points = {}
 transactions = []
 
 
-@app.get("/point_balance")
+@app.get("/")
 def get_payer_points():
     return payer_points
 
+
+
+# need to create transaction and add to transactions list
+# add to payer point balance if payer exists, otherwise create payer
 @app.post("/payer_transactions")
 def add_transaction(transaction: PayerTransaction):
-  pass
+  transactions.append(transaction)
+
+  if transaction.name not in payer_points:
+    payer_points[transaction.payer] = 0
+  payer_points[transaction.payer] += transaction.points
+
+  return "Transaction posted"
 
 @app.post("/spending")
-def spend_payer_points(spend: UserSpend):
+def spend_payer_points(points: int):
   pass
