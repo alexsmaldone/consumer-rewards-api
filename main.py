@@ -8,7 +8,7 @@ app = FastAPI()
 class PayerTransaction(BaseModel):
   payer: str
   points: int
-  timestamp: datetime
+  timestamp: datetime = datetime.now()
 
 
 
@@ -21,6 +21,11 @@ transactions = []
 def get_payer_points():
     return payer_points
 
+# DELETE THIS LATER
+@app.get("/transactions")
+def get_payer_points():
+    return transactions
+
 
 
 # need to create transaction and add to transactions list
@@ -29,11 +34,11 @@ def get_payer_points():
 def add_transaction(transaction: PayerTransaction):
   transactions.append(transaction)
 
-  if transaction.name not in payer_points:
+  if transaction.payer not in payer_points:
     payer_points[transaction.payer] = 0
   payer_points[transaction.payer] += transaction.points
 
-  return "Transaction posted"
+  return payer_points
 
 @app.post("/spending")
 def spend_payer_points(points: int):
