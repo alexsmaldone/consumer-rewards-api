@@ -1,5 +1,4 @@
 from concurrent.futures import process
-from wsgiref import validate
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
@@ -40,15 +39,27 @@ def get_payer_points():
 # add to payer point balance if payer exists, otherwise create payer
 @app.post("/payer_transactions")
 def add_transaction(transaction: PayerTransaction):
-  transactions.append(transaction)
-  transactions.sort(key=lambda date: date.timestamp, reverse=True)
+
+  validate_transaction(transaction, payer_points)
 
   if transaction.payer not in payer_points:
     payer_points[transaction.payer] = 0
   payer_points[transaction.payer] += transaction.points
   user.total_points += transaction.points
 
+  transactions.append(transaction)
+  transactions.sort(key=lambda date: date.timestamp, reverse=True)
   return [payer_points, user.total_points]
+
+def validate_transaction(transaction, payer_points):
+  if (transaction.payer not in payer_points and transaction.points < 0) or (transaction.payer in payer_points and payer_points[transaction.payer] + transaction.points < 0):
+    raise HTTPException(status_code=422,
+    detail=f'ERROR: Unable to add transaction; payer balance cannnot go negative. {transaction.payer} has {payer_points[transaction.payer] if transaction.payer in payer_points else 0} points in account.')
+  if transaction.points == 0:
+    raise HTTPException(status_code=422,
+    detail=f'ERROR: Unable to add transaction; Points must be positive or negative integer.')
+
+
 
 
 # check if spend is greater than amount of total points for User, return error if >
@@ -89,31 +100,35 @@ def process_spend(spend, transactions, payer_points):
       transaction_remove_counter += 1
 
     else:
-      pass
+      if spend > transaction.points:
+        if payer_points[transaction.payer] >= transaction.points:
+          spend -= transaction.points
+          payer_points[transaction.payer] -= transaction.points
+        if payer_points[transaction.payer] < transaction.points:
+          spend -= payer_points[transaction.payer]
+          payer_points[transaction.payer] = 0
 
-    if spend > transaction.points:
-      spend -= transaction.points
-      payer_points[transaction.payer] -= transaction.points
-      if transaction.payer not in spent:
-        spent[transaction.payer] = 0
-      spent[transaction.payer] -= transaction.points
-      transaction_remove_counter += 1
 
-    elif spend < transaction.points:
-      transaction.points -= spend
-      payer_points[transaction.payer] -= spend
-      if transaction.payer not in spent:
-        spent[transaction.payer] = 0
-      spent[transaction.payer] -= spend
-      spend = 0
+        if transaction.payer not in spent:
+          spent[transaction.payer] = 0
+        spent[transaction.payer] -= transaction.points
+        transaction_remove_counter += 1
 
-    else:
-      payer_points[transaction.payer] -= spend
-      if transaction.payer not in spent:
-        spent[transaction.payer] = 0
-      spent[transaction.payer] -= spend
-      transaction_remove_counter += 1
-      spend = 0
+      elif spend < transaction.points:
+        transaction.points -= spend
+        payer_points[transaction.payer] -= spend
+        if transaction.payer not in spent:
+          spent[transaction.payer] = 0
+        spent[transaction.payer] -= spend
+        spend = 0
+
+      else:
+        payer_points[transaction.payer] -= spend
+        if transaction.payer not in spent:
+          spent[transaction.payer] = 0
+        spent[transaction.payer] -= spend
+        transaction_remove_counter += 1
+        spend = 0
 
   while transaction_remove_counter > 0:
     transactions.pop()
