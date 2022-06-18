@@ -87,26 +87,14 @@ def spend_payer_points(spend: SpendPoints):
 def process_spend(spend, transactions, payer_points):
   spent = {}
   transaction_remove_counter = 0
-  for i in reversed(range(len(transactions))):
-    transaction = transactions[i]
-    if spend == 0:
-      break
+  counter = len(transactions) - 1
 
-    if transaction.points < 0:
-      spend -= transaction.points
-      if transaction.payer not in spent:
-        spent[transaction.payer] = 0
-      spent[transaction.payer] -= transaction.points
-      transaction_remove_counter += 1
 
-    else:
-      if spend > transaction.points:
-        if payer_points[transaction.payer] >= transaction.points:
-          spend -= transaction.points
-          payer_points[transaction.payer] -= transaction.points
-        if payer_points[transaction.payer] < transaction.points:
-          spend -= payer_points[transaction.payer]
-          payer_points[transaction.payer] = 0
+
+  while spend > 0:
+    pass
+
+
 
 
 
