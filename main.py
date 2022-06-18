@@ -1,3 +1,4 @@
+from concurrent.futures import process
 from wsgiref import validate
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
@@ -51,53 +52,65 @@ def add_transaction(transaction: PayerTransaction):
 
 
 # check if spend is greater than amount of total points for User, return error if >
-# iterate backward over transactions, subtract points from payer in payerpoints
+# iterate backward over transactions
+  # negative transaction point:
+    # if enough in payer_points
+      # logic here
+    # not enough in payer points
+      # logic here
+  # positive transaction points
+    # if enough in payer_points
+      # logic here
+    # not enough in payer points
+      # logic here
   # add payer and negative points taken to payer list
-  # if total amount is greater than amount in transaction, then delete that transaction
-  #
+
 # return list of dicts with payer and points subtracted from payer
 @app.post("/spend")
 def spend_payer_points(spend: SpendPoints):
   validate_spend(spend.points, user.total_points)
-
   user.total_points -= spend.points
+  return process_spend(spend.points, transactions, payer_points)
 
+
+def process_spend(spend, transactions, payer_points):
   subtracted_points = {}
   transaction_remove_counter = 0
   for i in reversed(range(len(transactions))):
 
     transaction = transactions[i]
-    if spend.points == 0:
+    if spend == 0:
       break
-    if spend.points > transaction.points:
-      spend.points -= transaction.points
+    if spend > transaction.points:
+      spend -= transaction.points
       payer_points[transaction.payer] -= transaction.points
       if transaction.payer not in subtracted_points:
         subtracted_points[transaction.payer] = 0
       subtracted_points[transaction.payer] -= transaction.points
       transaction_remove_counter += 1
 
-    elif spend.points < transaction.points:
-      transaction.points -= spend.points
-      payer_points[transaction.payer] -= spend.points
+    elif spend < transaction.points:
+      transaction.points -= spend
+      payer_points[transaction.payer] -= spend
       if transaction.payer not in subtracted_points:
         subtracted_points[transaction.payer] = 0
-      subtracted_points[transaction.payer] -= spend.points
-      spend.points = 0
+      subtracted_points[transaction.payer] -= spend
+      spend = 0
 
     else:
-      payer_points[transaction.payer] -= spend.points
+      payer_points[transaction.payer] -= spend
       if transaction.payer not in subtracted_points:
         subtracted_points[transaction.payer] = 0
-      subtracted_points[transaction.payer] -= spend.points
+      subtracted_points[transaction.payer] -= spend
       transaction_remove_counter += 1
-      spend.points = 0
+      spend = 0
 
   while transaction_remove_counter > 0:
     transactions.pop()
     transaction_remove_counter -= 1
 
   return subtracted_points
+
 def validate_spend(spend, user_points):
   if spend > user_points:
     raise HTTPException(status_code=422,
