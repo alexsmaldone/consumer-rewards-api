@@ -1,3 +1,4 @@
+from wsgiref import validate
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
@@ -57,9 +58,7 @@ def add_transaction(transaction: PayerTransaction):
 # return list of dicts with payer and points subtracted from payer
 @app.post("/spend")
 def spend_payer_points(spend: SpendPoints):
-  if spend.points > user.total_points:
-    raise HTTPException(status_code=422,
-    detail=f'ERROR: Only {user.total_points} points available to spend')
+  validate_spend(spend.points, user.total_points)
 
   user.total_points -= spend.points
 
@@ -100,6 +99,12 @@ def spend_payer_points(spend: SpendPoints):
 
   return subtracted_points
 def validate_spend(spend, user_points):
+  if spend > user_points:
+    raise HTTPException(status_code=422,
+    detail=f'ERROR: Only {user_points} points available to spend')
+  if spend <= 0:
+    raise HTTPException(status_code=422,
+    detail=f'ERROR: Points spend must be greater than 0.')
   pass
 
 
