@@ -74,34 +74,44 @@ def spend_payer_points(spend: SpendPoints):
 
 
 def process_spend(spend, transactions, payer_points):
-  subtracted_points = {}
+  spent = {}
   transaction_remove_counter = 0
   for i in reversed(range(len(transactions))):
-
     transaction = transactions[i]
     if spend == 0:
       break
+
+    if transaction.points < 0:
+      spend -= transaction.points
+      if transaction.payer not in spent:
+        spent[transaction.payer] = 0
+      spent[transaction.payer] -= transaction.points
+      transaction_remove_counter += 1
+
+    else:
+      pass
+
     if spend > transaction.points:
       spend -= transaction.points
       payer_points[transaction.payer] -= transaction.points
-      if transaction.payer not in subtracted_points:
-        subtracted_points[transaction.payer] = 0
-      subtracted_points[transaction.payer] -= transaction.points
+      if transaction.payer not in spent:
+        spent[transaction.payer] = 0
+      spent[transaction.payer] -= transaction.points
       transaction_remove_counter += 1
 
     elif spend < transaction.points:
       transaction.points -= spend
       payer_points[transaction.payer] -= spend
-      if transaction.payer not in subtracted_points:
-        subtracted_points[transaction.payer] = 0
-      subtracted_points[transaction.payer] -= spend
+      if transaction.payer not in spent:
+        spent[transaction.payer] = 0
+      spent[transaction.payer] -= spend
       spend = 0
 
     else:
       payer_points[transaction.payer] -= spend
-      if transaction.payer not in subtracted_points:
-        subtracted_points[transaction.payer] = 0
-      subtracted_points[transaction.payer] -= spend
+      if transaction.payer not in spent:
+        spent[transaction.payer] = 0
+      spent[transaction.payer] -= spend
       transaction_remove_counter += 1
       spend = 0
 
@@ -109,7 +119,7 @@ def process_spend(spend, transactions, payer_points):
     transactions.pop()
     transaction_remove_counter -= 1
 
-  return subtracted_points
+  return spent
 
 def validate_spend(spend, user_points):
   if spend > user_points:
