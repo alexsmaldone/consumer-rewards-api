@@ -10,9 +10,13 @@ class PayerTransaction(BaseModel):
   points: int
   timestamp: datetime = datetime.now()
 
+class User():
+  total_points = 0
+  def __init__(self, total_points=0):
+    self.total_points = total_points
 
 
-total_points = 0
+new_user = User()
 payer_points = {}
 transactions = []
 
@@ -37,8 +41,9 @@ def add_transaction(transaction: PayerTransaction):
   if transaction.payer not in payer_points:
     payer_points[transaction.payer] = 0
   payer_points[transaction.payer] += transaction.points
+  new_user.total_points += transaction.points
 
-  return payer_points
+  return [payer_points, new_user.total_points]
 
 @app.post("/spending")
 def spend_payer_points(points: int):
