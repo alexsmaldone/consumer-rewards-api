@@ -63,9 +63,42 @@ def spend_payer_points(spend: SpendPoints):
 
   user.total_points -= spend.points
 
+  subtracted_points = {}
+  transaction_remove_counter = 0
   for i in reversed(range(len(transactions))):
-    pass
 
+    transaction = transactions[i]
+    if spend.points == 0:
+      break
+    if spend.points > transaction.points:
+      spend.points -= transaction.points
+      payer_points[transaction.payer] -= transaction.points
+      if transaction.payer not in subtracted_points:
+        subtracted_points[transaction.payer] = 0
+      subtracted_points[transaction.payer] -= transaction.points
+      transaction_remove_counter += 1
+
+    elif spend.points < transaction.points:
+      transaction.points -= spend.points
+      payer_points[transaction.payer] -= spend.points
+      if transaction.payer not in subtracted_points:
+        subtracted_points[transaction.payer] = 0
+      subtracted_points[transaction.payer] -= spend.points
+      spend.points = 0
+
+    else:
+      payer_points[transaction.payer] -= spend.points
+      if transaction.payer not in subtracted_points:
+        subtracted_points[transaction.payer] = 0
+      subtracted_points[transaction.payer] -= spend.points
+      transaction_remove_counter += 1
+      spend.points = 0
+
+  while transaction_remove_counter > 0:
+    transactions.pop()
+    transaction_remove_counter -= 1
+
+  return subtracted_points
 def validate_spend(spend, user_points):
   pass
 
