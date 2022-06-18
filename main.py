@@ -29,7 +29,7 @@ def get_payer_points():
     return payer_points
 
 # DELETE THIS LATER
-@app.get("/transactions")
+@app.get("/transactions", status_code=200)
 def get_payer_points():
     return transactions
 
@@ -37,7 +37,7 @@ def get_payer_points():
 
 # need to create transaction and add to transactions list
 # add to payer point balance if payer exists, otherwise create payer
-@app.post("/payer_transactions")
+@app.post("/payer_transactions", status_code=200)
 def add_transaction(transaction: PayerTransaction):
 
   validate_transaction(transaction, payer_points)
@@ -77,7 +77,7 @@ def validate_transaction(transaction, payer_points):
   # add payer and negative points taken to payer list
 
 # return list of dicts with payer and points subtracted from payer
-@app.post("/spend")
+@app.post("/spend", status_code=200)
 def spend_payer_points(spend: SpendPoints):
   validate_spend(spend.points, user.total_points)
   user.total_points -= spend.points
