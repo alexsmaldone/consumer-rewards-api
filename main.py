@@ -94,13 +94,15 @@ def process_spend(spend, transactions, payer_points):
     trans_pts = transaction.points
     payer_balance = payer_points[transaction.payer]
 
-    if trans_pts > spend:
-      pass
+    if trans_pts < 0:
+      spend -= trans_pts
+      if transaction.payer not in spent:
+        spent[transaction.payer] = 0
+      spent[transaction.payer] -= trans_pts
+      transaction_remove_counter += 1
+      transIdx -= 1
 
-    elif trans_pts < spend:
-      pass
-
-    elif trans_pts == spend:
+    elif trans_pts > 0:
       pass
 
 
@@ -118,8 +120,3 @@ def validate_spend(spend, user_points):
   if spend <= 0:
     raise HTTPException(status_code=422,
     detail=f'ERROR: Points spend must be greater than 0.')
-  pass
-
-
-
-  return {"points": user.total_points}
