@@ -109,26 +109,7 @@ def process_spend(spend, transactions, payer_points):
           payer_points[transaction.payer] = 0
 
 
-        if transaction.payer not in spent:
-          spent[transaction.payer] = 0
-        spent[transaction.payer] -= transaction.points
-        transaction_remove_counter += 1
 
-      elif spend < transaction.points:
-        transaction.points -= spend
-        payer_points[transaction.payer] -= spend
-        if transaction.payer not in spent:
-          spent[transaction.payer] = 0
-        spent[transaction.payer] -= spend
-        spend = 0
-
-      else:
-        payer_points[transaction.payer] -= spend
-        if transaction.payer not in spent:
-          spent[transaction.payer] = 0
-        spent[transaction.payer] -= spend
-        transaction_remove_counter += 1
-        spend = 0
 
   while transaction_remove_counter > 0:
     transactions.pop()
