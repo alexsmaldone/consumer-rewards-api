@@ -10,6 +10,9 @@ class PayerTransaction(BaseModel):
   points: int
   timestamp: datetime = datetime.now()
 
+class SpendPoints(BaseModel):
+  points: int
+
 class User():
   total_points = 0
   def __init__(self, total_points=0):
@@ -37,6 +40,7 @@ def get_payer_points():
 @app.post("/payer_transactions")
 def add_transaction(transaction: PayerTransaction):
   transactions.append(transaction)
+  transactions.sort(key=lambda date: date.timestamp, reverse=True)
 
   if transaction.payer not in payer_points:
     payer_points[transaction.payer] = 0
@@ -45,6 +49,12 @@ def add_transaction(transaction: PayerTransaction):
 
   return [payer_points, new_user.total_points]
 
+
+#
 @app.post("/spending")
-def spend_payer_points(points: int):
-  pass
+def spend_payer_points(spend: SpendPoints):
+  new_user.total_points -= spend.points
+
+
+
+  return {"points": new_user.total_points}
