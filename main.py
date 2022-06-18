@@ -103,7 +103,25 @@ def process_spend(spend, transactions, payer_points):
       transIdx -= 1
 
     elif trans_pts > 0:
-      pass
+      # have enough
+      if trans_pts > spend:
+        if payer_balance >= spend:
+          payer_balance -= spend
+          if transaction.payer not in spent:
+            spent[transaction.payer] = 0
+          spent[transaction.payer] -= spend
+          spend = 0
+        elif payer_balance < spend:
+          spend -= payer_balance
+          if transaction.payer not in spent:
+            spent[transaction.payer] = 0
+          spent[transaction.payer] -= payer_balance
+          trans_pts -= payer_balance
+          payer_balance = 0
+      # don't have enough
+      elif trans_pts < spend:
+        pass
+
 
 
 
