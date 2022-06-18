@@ -1,5 +1,4 @@
-from sqlite3 import Timestamp
-from fastapi import FastAPI
+from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -19,7 +18,7 @@ class User():
     self.total_points = total_points
 
 
-new_user = User()
+user = User()
 payer_points = {}
 transactions = []
 
@@ -45,16 +44,31 @@ def add_transaction(transaction: PayerTransaction):
   if transaction.payer not in payer_points:
     payer_points[transaction.payer] = 0
   payer_points[transaction.payer] += transaction.points
-  new_user.total_points += transaction.points
+  user.total_points += transaction.points
 
-  return [payer_points, new_user.total_points]
+  return [payer_points, user.total_points]
 
 
-#
-@app.post("/spending")
+# check if spend is greater than amount of total points for User, return error if >
+# iterate backward over transactions, subtract points from payer in payerpoints
+  # add payer and negative points taken to payer list
+  # if total amount is greater than amount in transaction, then delete that transaction
+  #
+# return list of dicts with payer and points subtracted from payer
+@app.post("/spend")
 def spend_payer_points(spend: SpendPoints):
-  new_user.total_points -= spend.points
+  if spend.points > user.total_points:
+    raise HTTPException(status_code=422,
+    detail=f'ERROR: Only {user.total_points} points available to spend')
+
+  user.total_points -= spend.points
+
+  for i in reversed(range(len(transactions))):
+    pass
+
+def validate_spend(spend, user_points):
+  pass
 
 
 
-  return {"points": new_user.total_points}
+  return {"points": user.total_points}
