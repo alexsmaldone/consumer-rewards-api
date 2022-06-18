@@ -122,6 +122,9 @@ def process_spend(spend, transactions, payer_points):
       elif trans_pts < spend:
         pass
 
+      elif trans_pts == spend:
+        pass
+
 
 
 
