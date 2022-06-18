@@ -89,12 +89,20 @@ def process_spend(spend, transactions, payer_points):
   transaction_remove_counter = 0
   transIdx = len(transactions) - 1
 
-
-
   while spend > 0:
     transaction = transactions[transIdx]
+    trans_pts = transaction.points
     payer_balance = payer_points[transaction.payer]
-    pass
+
+    if trans_pts > spend:
+      pass
+
+    elif trans_pts < spend:
+      pass
+
+    elif trans_pts == spend:
+      pass
+
 
 
   while transaction_remove_counter > 0:
