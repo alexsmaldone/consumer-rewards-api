@@ -61,7 +61,7 @@ def process_transaction(transactions, transaction, payer_points):
     last_trans = transactions[transIdx]
     while transaction.points < 0:
       if abs(last_trans.points) > abs(transaction.points):
-        last_trans.points += transaction.points
+        transactions[transIdx].points += transaction.points
         payer_points[transaction.payer] += transaction.points
         transaction.points = 0
       else:
