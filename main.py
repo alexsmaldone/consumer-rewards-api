@@ -41,15 +41,40 @@ def get_payer_points():
 def add_transaction(transaction: PayerTransaction):
 
   validate_transaction(transaction, payer_points)
+  return process_transaction(transactions, transaction, payer_points)
 
-  if transaction.payer not in payer_points:
-    payer_points[transaction.payer] = 0
-  payer_points[transaction.payer] += transaction.points
+def process_transaction(transactions, transaction, payer_points):
   user.total_points += transaction.points
 
-  transactions.append(transaction)
-  transactions.sort(key=lambda date: date.timestamp, reverse=True)
-  return [payer_points, user.total_points]
+  if transaction.points > 0:
+    if transaction.payer not in payer_points:
+      payer_points[transaction.payer] = 0
+    payer_points[transaction.payer] += transaction.points
+    transactions.append(transaction)
+    transactions.sort(key=lambda date: date.timestamp, reverse=True)
+
+    return payer_points
+
+  else:
+    remove_counter = 0
+    transIdx = len(transactions) - 1
+    last_trans = transactions[transIdx]
+    while transaction.points < 0:
+      if abs(last_trans.points) > abs(transaction.points):
+        last_trans.points += transaction.points
+        payer_points[transaction.payer] += transaction.points
+        transaction.points = 0
+      else:
+        payer_points[transaction.payer] -= last_trans.points
+        transaction.points += last_trans.points
+        remove_counter += 1
+        transIdx -= 1
+
+    while remove_counter > 0:
+      transactions.pop()
+      remove_counter -= 1
+
+    return payer_points
 
 def validate_transaction(transaction, payer_points):
   if (transaction.payer not in payer_points and transaction.points < 0) or (transaction.payer in payer_points and payer_points[transaction.payer] + transaction.points < 0):
