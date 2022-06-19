@@ -33,9 +33,6 @@ def get_payer_points():
     return transactions
 
 
-
-# need to create transaction and add to transactions list
-# add to payer point balance if payer exists, otherwise create payer
 @app.post("/payer_transactions", status_code=200)
 def add_transaction(transaction: PayerTransaction):
 
