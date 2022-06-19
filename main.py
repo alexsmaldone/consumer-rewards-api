@@ -14,7 +14,6 @@ class SpendPoints(BaseModel):
   points: int
 
 class User():
-  total_points = 0
   def __init__(self, total_points=0):
     self.total_points = total_points
 
@@ -85,23 +84,6 @@ def validate_transaction(transaction, payer_points):
     detail=f'ERROR: Unable to add transaction; Points must be positive or negative integer.')
 
 
-
-
-# check if spend is greater than amount of total points for User, return error if >
-# iterate backward over transactions
-  # negative transaction point:
-    # if enough in payer_points
-      # logic here
-    # not enough in payer points
-      # logic here
-  # positive transaction points
-    # if enough in payer_points
-      # logic here
-    # not enough in payer points
-      # logic here
-  # add payer and negative points taken to payer list
-
-# return list of dicts with payer and points subtracted from payer
 @app.post("/spend", status_code=200)
 def spend_payer_points(spend: SpendPoints):
   validate_spend(spend.points, user.total_points)
@@ -118,48 +100,41 @@ def process_spend(spend, transactions, payer_points):
     transaction = transactions[transIdx]
     trans_pts = transaction.points
 
-    if trans_pts < 0:
-      transaction_remove_counter += 1
-      transIdx -= 1
+    if trans_pts > spend:
+      if payer_points[transaction.payer] >= spend:
+        payer_points[transaction.payer] -= spend
+        if transaction.payer not in spent:
+          spent[transaction.payer] = 0
+        spent[transaction.payer] -= spend
+        transaction.points -= spend
+        spend = 0
+      else:
+        spend -= payer_points[transaction.payer]
+        if transaction.payer not in spent:
+          spent[transaction.payer] = 0
+        spent[transaction.payer] -= payer_points[transaction.payer]
+        payer_points[transaction.payer] = 0
+        transaction_remove_counter += 1
+        transIdx -= 1
 
-    elif trans_pts > 0:
-      # have enough
-      if trans_pts > spend:
-        if payer_points[transaction.payer] >= spend:
-          payer_points[transaction.payer] -= spend
-          if transaction.payer not in spent:
-            spent[transaction.payer] = 0
-          spent[transaction.payer] -= spend
-          transaction.points -= spend
-          spend = 0
-        else:
-          spend -= payer_points[transaction.payer]
-          if transaction.payer not in spent:
-            spent[transaction.payer] = 0
-          spent[transaction.payer] -= payer_points[transaction.payer]
-          payer_points[transaction.payer] = 0
-          transaction_remove_counter += 1
-          transIdx -= 1
+    elif trans_pts <= spend:
 
-      elif trans_pts <= spend:
-        if payer_points[transaction.payer] >= trans_pts:
-          payer_points[transaction.payer] -= trans_pts
-          if transaction.payer not in spent:
-            spent[transaction.payer] = 0
-          spent[transaction.payer] -= trans_pts
-          spend -= trans_pts
-          transaction_remove_counter += 1
-          transIdx -= 1
-        else:
-          spend -= payer_points[transaction.payer]
-          if transaction.payer not in spent:
-            spent[transaction.payer] = 0
-          spent[transaction.payer] -= payer_points[transaction.payer]
-          payer_points[transaction.payer] = 0
-          transaction_remove_counter += 1
-          transIdx -= 1
-
-
+      if payer_points[transaction.payer] >= trans_pts:
+        payer_points[transaction.payer] -= trans_pts
+        if transaction.payer not in spent:
+          spent[transaction.payer] = 0
+        spent[transaction.payer] -= trans_pts
+        spend -= trans_pts
+        transaction_remove_counter += 1
+        transIdx -= 1
+      else:
+        spend -= payer_points[transaction.payer]
+        if transaction.payer not in spent:
+          spent[transaction.payer] = 0
+        spent[transaction.payer] -= payer_points[transaction.payer]
+        payer_points[transaction.payer] = 0
+        transaction_remove_counter += 1
+        transIdx -= 1
 
   while transaction_remove_counter > 0:
     transactions.pop()
