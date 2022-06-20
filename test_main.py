@@ -12,7 +12,7 @@ client = TestClient(app)
 # =============================================================================================
 # GET /POINTS
 # =============================================================================================
-def test_get_payer_points():
+def test_get_payer_zero_points():
   response = client.get("/points")
   assert response.status_code == 200
   assert response.json() == {}
@@ -88,3 +88,8 @@ def test_valid_transaction_spend_sequence():
   )
   assert response.status_code == 200
   assert response.json() == [{"payer": "A", "points": -50}, {"payer": "B", "points": -100}]
+
+def test_get_payer_end_points():
+  response = client.get("/points")
+  assert response.status_code == 200
+  assert response.json() == {"A": 0, "B": 50}
