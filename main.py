@@ -28,15 +28,15 @@ def get_payer_points():
 
     return payer_points
 
-# @app.get("/transactions", status_code=200)
-# def get_transactions():
+@app.get("/transactions", status_code=200)
+def get_transactions():
 
-#     return transactions
+    return transactions
 
 @app.post("/points", status_code=200)
 def add_transaction(transaction: PayerTransaction):
 
-  validate_transaction(transaction, payer_points)
+  validate_transaction(transaction, payer_points, transactions)
   return process_transaction(transactions, transaction, payer_points, user)
 
 @app.post("/spend", status_code=200)

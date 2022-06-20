@@ -1,15 +1,24 @@
 from fastapi import HTTPException
+from datetime import date
 # =========================================================================================
 # POST /points
 # =========================================================================================
 
-def validate_transaction(transaction, payer_points):
+def validate_transaction(transaction, payer_points, transactions):
   if (transaction.payer not in payer_points and transaction.points < 0) or (transaction.payer in payer_points and payer_points[transaction.payer] + transaction.points < 0):
     raise HTTPException(status_code=422,
     detail=f'ERROR: Unable to add transaction; payer balance cannnot go negative. {transaction.payer} has {payer_points[transaction.payer] if transaction.payer in payer_points else 0} points in account.')
   if transaction.points == 0:
     raise HTTPException(status_code=422,
     detail=f'ERROR: Unable to add transaction; Points must be positive or negative integer.')
+
+  transactions_copy = transactions[:]
+  transactions_copy.append(transaction)
+  try:
+    transactions_copy.sort(key=lambda date: date.timestamp, reverse=True)
+  except:
+    raise HTTPException(status_code=422,
+    detail=f'ERROR: Unable to add transaction; Date formatted incorrectly.')
 
 def process_transaction(transactions, transaction, payer_points, user):
   user.total_points += transaction.points
