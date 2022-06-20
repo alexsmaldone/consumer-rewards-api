@@ -54,7 +54,7 @@ def process_transaction(transactions, transaction, payer_points, user):
     return {"Message": "Transaction Successful", "Current Balance": payer_points}
 
 # =========================================================================================
-# POST /spend
+# POST /points/spend
 # =========================================================================================
 
 def validate_spend(spend, user_points):

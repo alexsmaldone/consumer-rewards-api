@@ -50,10 +50,10 @@ def test_valid_transaction_sequence():
   assert response.json() == {"Message": "Transaction Successful", "Current Balance": {"A": 0, "B": 0}}
 
 # =============================================================================================
-# POST /SPEND
+# POST /POINTS/SPEND
 # =============================================================================================
 def test_invalid_negative_spend():
-  response = client.post("/spend",
+  response = client.post("/points/spend",
   json={"points": -50},
   )
   assert response.status_code == 422
@@ -66,7 +66,7 @@ def test_invalid_too_many_points_spend():
   client.post("/points",
   json={"payer": "A", "points": -100, "timestamp": "2022-06-20T11:07:05.017197"},
   )
-  response = client.post("/spend",
+  response = client.post("/points/spend",
   json={"points": 500},
   )
   assert response.status_code == 422
@@ -82,7 +82,7 @@ def test_valid_transaction_spend_sequence():
   client.post("/points",
   json={"payer": "B", "points": 150, "timestamp": "2022-06-20T11:07:03.017197"},
   )
-  response = client.post("/spend",
+  response = client.post("/points/spend",
   json={"points": 150},
   )
   assert response.status_code == 200
