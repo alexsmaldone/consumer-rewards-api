@@ -22,6 +22,10 @@ user = User()
 payer_points = {}
 transactions = []
 
+@app.get("/")
+def home():
+  return "Hi! Welcome to Alex Smaldone's Fetch Rewards Backend Engineer Takehome Test"
+
 
 @app.get("/points", status_code=200)
 def get_payer_points():
