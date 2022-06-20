@@ -37,7 +37,7 @@ def get_transactions():
 def add_transaction(transaction: PayerTransaction):
 
   validate_transaction(transaction, payer_points)
-  return process_transaction(transactions, transaction, payer_points)
+  return process_transaction(transactions, transaction, payer_points, user)
 
 @app.post("/spend", status_code=200)
 def spend_payer_points(spend: SpendPoints):
