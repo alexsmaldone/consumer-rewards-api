@@ -17,3 +17,18 @@ A REST API designed to receive HTTP requests and return responses based on a use
 * [FastAPI](https://fastapi.tiangolo.com/) - A modern, fast, web framework for building APIs with Python 3.6+ based on standard Python type hints
 * [Pydantic](https://pydantic-docs.helpmanual.io/) - Data validation and settings management using python type annotations
 * [Pytest](https://docs.pytest.org/en/7.1.x/index.html) - Python testing framework
+
+## Installation
+
+1) Clone git repo to your local machine 
+   ```
+    git clone https://github.com/alexsmaldone/fetchrewards-takehome.git
+   ```
+2) Cd into the project's root directory 
+   ```
+    cd fetchrewards-takehome/
+   ```
+3) Install dependencies
+   ```
+    pip install -r requirements.txt
+   ```
