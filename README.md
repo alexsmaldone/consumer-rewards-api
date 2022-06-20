@@ -38,3 +38,81 @@ A REST API designed to receive HTTP requests and return responses based on a use
    ```
    Your terminal should read: 
    ` Uvicorn running on http://127.0.0.1:8000`
+   
+   You can verify the server is running by visiting http://localhost:8000 in your browser, where you should see this response: 
+   
+   `Hi! Welcome to Alex Smaldone's Fetch Rewards Backend Engineer Takehome Test`
+   
+## Using the API
+_This service uses no database or persistent storage, so user points / payer transactions will reset every time the server is started/restarted_
+
+I recommend using a tool like [Postman](https://www.postman.com/downloads/) to test out API calls. 
+
+## POST Route "/points" - Add Payer Transaction
+***Request Format*** 
+```
+{"payer": <str>, "points": <int>, "timestamp": <datetime>}
+```
+
+***Example Request and Response*** 
+```
+{"payer": "Nike, "points": 500, "timestamp": "2022-06-20T11:07:01.017197"}
+```
+```
+{"Message": "Transaction Successful", "Current Balance": 500}
+```
+
+***Example Request and Response (including previous)*** 
+```
+{"payer": "Adidas, "points": 500, "timestamp": "2022-06-20T11:07:02.017197"}
+```
+```
+{"Message": "Transaction Successful", "Current Balance": 1000}
+```
+
+***Error Handling***
+* Preventing payer balances from going negative
+* Preventing 0 points transactions 
+* Type checking for request body values 
+
+## POST Route "/points/spend" - Spend User Points 
+***Request Format*** 
+```
+{"points": <int>}
+```
+
+***Example Request and Response*** 
+```
+{"points": 250}
+```
+Subtracts 250 points from Nike payer balance as it is the oldest transaction. 
+```
+{"payer": "Nike", "points": -250}
+```
+
+***Error Handling***
+* Preventing spend that is greater than total user points
+* Preventing negative spend 
+* Type checking for request body values 
+
+## GET Route "/points" - Get User Points by Payer
+After making the above transaction and spend requests, the payer points would look like:
+```
+{
+"Nike": 250, "Adidas": 500
+}
+```
+
+## Running Tests
+You can run the tests in `test_main.py` from the main directory by running:
+```
+pytest
+```
+
+The tests check the following:
+* Returns the proper points balance
+* Cannot create negative payer balances with a transaction
+* Cannot add 0 point transactions 
+* Tests valid transaction sequences
+* Tests valid spend sequences 
+* Spend must be greater than 0 and less than total available points 
