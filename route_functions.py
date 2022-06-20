@@ -23,35 +23,14 @@ def validate_transaction(transaction, payer_points, transactions):
 def process_transaction(transactions, transaction, payer_points, user):
   user.total_points += transaction.points
 
-  if transaction.points > 0:
-    if transaction.payer not in payer_points:
-      payer_points[transaction.payer] = 0
-    payer_points[transaction.payer] += transaction.points
-    transactions.append(transaction)
-    transactions.sort(key=lambda date: date.timestamp, reverse=True)
+  if transaction.payer not in payer_points:
+    payer_points[transaction.payer] = 0
+  payer_points[transaction.payer] += transaction.points
+  transactions.append(transaction)
+  transactions.sort(key=lambda date: date.timestamp, reverse=True)
 
-    return {"Message": "Transaction Successful", "Current Balance": payer_points}
+  return {"Message": "Transaction Successful", "Current Balance": payer_points}
 
-  else:
-    remove_counter = 0
-    transIdx = len(transactions) - 1
-    last_trans = transactions[transIdx]
-    while transaction.points < 0:
-      if abs(last_trans.points) > abs(transaction.points):
-        transactions[transIdx].points += transaction.points
-        payer_points[transaction.payer] += transaction.points
-        transaction.points = 0
-      else:
-        payer_points[transaction.payer] -= last_trans.points
-        transaction.points += last_trans.points
-        remove_counter += 1
-        transIdx -= 1
-
-    while remove_counter > 0:
-      transactions.pop()
-      remove_counter -= 1
-
-    return {"Message": "Transaction Successful", "Current Balance": payer_points}
 
 # =========================================================================================
 # POST /points/spend
@@ -72,43 +51,26 @@ def process_spend(spend, transactions, payer_points):
 
   while spend > 0:
     transaction = transactions[transIdx]
-    trans_pts = transaction.points
 
-    if trans_pts > spend:
-      if payer_points[transaction.payer] >= spend:
-        payer_points[transaction.payer] -= spend
-        if transaction.payer not in spent:
-          spent[transaction.payer] = 0
-        spent[transaction.payer] -= spend
-        transaction.points -= spend
-        spend = 0
-      else:
-        spend -= payer_points[transaction.payer]
-        if transaction.payer not in spent:
-          spent[transaction.payer] = 0
-        spent[transaction.payer] -= payer_points[transaction.payer]
-        payer_points[transaction.payer] = 0
-        transaction_remove_counter += 1
-        transIdx -= 1
+    if transaction.points < spend:
+      if transaction.payer not in spent:
+        spent[transaction.payer] = 0
+      spent[transaction.payer] -= transaction.points
+      payer_points[transaction.payer] -= transaction.points
+      spend -= transaction.points
+      transaction.points = 0
 
-    elif trans_pts <= spend:
+    if transaction.points >= spend:
+      if transaction.payer not in spent:
+        spent[transaction.payer] = 0
+      spent[transaction.payer] -= spend
+      transaction.points -= spend
+      payer_points[transaction.payer] -= spend
+      spend = 0
 
-      if payer_points[transaction.payer] >= trans_pts:
-        payer_points[transaction.payer] -= trans_pts
-        if transaction.payer not in spent:
-          spent[transaction.payer] = 0
-        spent[transaction.payer] -= trans_pts
-        spend -= trans_pts
-        transaction_remove_counter += 1
-        transIdx -= 1
-      else:
-        spend -= payer_points[transaction.payer]
-        if transaction.payer not in spent:
-          spent[transaction.payer] = 0
-        spent[transaction.payer] -= payer_points[transaction.payer]
-        payer_points[transaction.payer] = 0
-        transaction_remove_counter += 1
-        transIdx -= 1
+    if transaction.points == 0:
+      transaction_remove_counter += 1
+      transIdx -= 1
 
   while transaction_remove_counter > 0:
     transactions.pop()
