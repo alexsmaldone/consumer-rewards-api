@@ -42,13 +42,13 @@ def test_valid_transaction_sequence():
   json={"payer": "B", "points": 100, "timestamp": "2022-06-20T11:07:05.017197"},
   )
   client.post("/points",
-  json={"payer": "A", "points": -50, "timestamp": "2022-06-20T11:07:05.017197"},
+  json={"payer": "A", "points": -100, "timestamp": "2022-06-20T11:07:05.017197"},
   )
   response = client.post("/points",
-  json={"payer": "B", "points": -50, "timestamp": "2022-06-20T11:07:05.017197"},
+  json={"payer": "B", "points": -100, "timestamp": "2022-06-20T11:07:05.017197"},
   )
   assert response.status_code == 200
-  assert response.json() == {"Message": "Transaction Successful", "Current Balance": {"A": 50, "B": 50}}
+  assert response.json() == {"Message": "Transaction Successful", "Current Balance": {"A": 0, "B": 0}}
 
 # =============================================================================================
 # POST /SPEND
@@ -57,5 +57,18 @@ def test_invalid_negative_spend():
   response = client.post("/spend",
   json={"points": -50},
   )
-  assert response.status_code == 200
-  assert response.json() == {"Message": "Transaction Successful", "Current Balance": {"A": 50, "B": 50}}
+  assert response.status_code == 422
+  assert response.json() == {"detail": 'ERROR: Points spend must be greater than 0.'}
+
+def test_invalid_too_many_points_spend():
+  client.post("/points",
+  json={"payer": "A", "points": 100, "timestamp": "2022-06-20T11:07:05.017197"},
+  )
+  client.post("/points",
+  json={"payer": "A", "points": -100, "timestamp": "2022-06-20T11:07:05.017197"},
+  )
+  response = client.post("/spend",
+  json={"points": 500},
+  )
+  assert response.status_code == 422
+  assert response.json() == {"detail": 'ERROR: Not enough points. 0 points available to spend.'}
