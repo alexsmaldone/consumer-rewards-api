@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
 from route_functions import validate_transaction, process_transaction, validate_spend, process_spend

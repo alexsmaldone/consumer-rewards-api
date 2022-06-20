@@ -72,3 +72,19 @@ def test_invalid_too_many_points_spend():
   )
   assert response.status_code == 422
   assert response.json() == {"detail": 'ERROR: Not enough points. 0 points available to spend.'}
+
+def test_valid_transaction_spend_sequence():
+  client.post("/points",
+  json={"payer": "A", "points": 100, "timestamp": "2022-06-20T11:07:01.017197"},
+  )
+  client.post("/points",
+  json={"payer": "A", "points": -50, "timestamp": "2022-06-20T11:07:02.017197"},
+  )
+  client.post("/points",
+  json={"payer": "B", "points": 150, "timestamp": "2022-06-20T11:07:03.017197"},
+  )
+  response = client.post("/spend",
+  json={"points": 150},
+  )
+  assert response.status_code == 200
+  assert response.json() == [{"payer": "A", "points": -50}, {"payer": "B", "points": -100}]
