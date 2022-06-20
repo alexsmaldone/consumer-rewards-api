@@ -32,3 +32,9 @@ A REST API designed to receive HTTP requests and return responses based on a use
    ```
     pip install -r requirements.txt
    ```
+4) Start the server
+   ```
+    uvicorn main:app --reload
+   ```
+   Your terminal should read: 
+   ` Uvicorn running on http://127.0.0.1:8000`
