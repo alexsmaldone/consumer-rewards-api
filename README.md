@@ -1,4 +1,4 @@
-# Consumer Rewards Points for Purchases API Design
+# Rewards Points for Consumer Transactions API Design
 A REST API designed to receive HTTP requests and return responses based on a user's transactions, reward points balance, and reward points spend. 
 
 ## Overview
