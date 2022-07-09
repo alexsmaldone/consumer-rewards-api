@@ -1,4 +1,4 @@
-# Consumer Rewards Points for Purchases API
+# Consumer Rewards Points for Purchases API Design
 A REST API designed to receive HTTP requests and return responses based on a user's transactions, reward points balance, and reward points spend. 
 
 ## Overview
@@ -22,7 +22,7 @@ A REST API designed to receive HTTP requests and return responses based on a use
 
 1) Clone git repo to your local machine 
    ```
-    git clone https://github.com/alexsmaldone/fetchrewards-takehome.git
+    git clone https://github.com/alexsmaldone/consumer-rewards-api.git
    ```
 2) Cd into the project's root directory 
    ```
@@ -41,7 +41,7 @@ A REST API designed to receive HTTP requests and return responses based on a use
    
    You can verify the server is running by visiting http://localhost:8000 in your browser, where you should see this response: 
    
-   `Hi! Welcome to Alex Smaldone's Fetch Rewards Backend Engineer Takehome Test`
+   `Hi! Welcome to Alex Smaldone's mock API design for a consumer app that tracks a user's transactions and allocates rewards points based on those transactions.`
    
 ## Using the API
 _This service uses no database or persistent storage, so user points / payer transactions will reset every time the server is started/restarted_
