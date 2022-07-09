@@ -1,8 +1,8 @@
-# Fetch Rewards Backend Software Engineering Takehome
+# Consumer Rewards Points for Purchases API
 A REST API designed to receive HTTP requests and return responses based on a user's transactions, reward points balance, and reward points spend. 
 
 ## Overview
-* A `user` can have reward points balances in their account from various `payers` (presumably businesses where a user transacts)
+* A `user` can have reward points balances in their account from various `payers` (businesses where a user transacts)
   * e.g., `{"Nike": 500, "Cheesecake Factory": 1000}`
  
 * `Transactions` are submitted to add or subtract points from a user's reward points balance
