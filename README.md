@@ -26,7 +26,7 @@ A REST API designed to receive HTTP requests and return responses based on a use
    ```
 2) Cd into the project's root directory 
    ```
-    cd fetchrewards-takehome/
+    cd consumer-rewards-api/
    ```
 3) Install dependencies
    ```
