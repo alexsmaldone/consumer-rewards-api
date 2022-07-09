@@ -9,9 +9,12 @@ class PayerTransaction(BaseModel):
   payer: str
   points: int
   timestamp: datetime = datetime.now()
+  expired: datetime
+  spent: bool = False
 
 class SpendPoints(BaseModel):
   points: int
+  timestamp: datetime = datetime.now()
 
 class User():
   def __init__(self, total_points=0):
@@ -24,12 +27,12 @@ transactions = []
 
 @app.get("/")
 def home():
-  return "Hi! Welcome to Alex Smaldone's Fetch Rewards Backend Engineer Takehome Test"
+  return "Hi! Welcome to Alex Smaldone's mock API design for a consumer app that tracks a user's transactions and allocates rewards points based on those transactions"
 
 
 @app.get("/points", status_code=200)
 def get_payer_points():
-
+    #
     return payer_points
 
 @app.post("/points", status_code=200)
