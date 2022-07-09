@@ -1,5 +1,5 @@
 # Rewards Points for Consumer Transactions API Design
-A REST API designed to receive HTTP requests and return responses based on a user's transactions, reward points balance, and reward points spend. 
+This project is REST API designed for a mock consumer application where users can earn rewards points for transactions with certain businesses and then spend those reward points.   
 
 ## Overview
 * A `user` can have reward points balances in their account from various `payers` (businesses where a user transacts)
